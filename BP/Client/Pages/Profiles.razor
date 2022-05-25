@@ -1,0 +1,56 @@
+﻿@page "/profiles"
+    <MudPaper Elevation="25" Class="py-4 flex-grow-1">
+            <MudText  Align="Align.Center"  Typo="Typo.subtitle1" Class="smaller" Style="margin-bottom: 5%">
+                Bekijk hier profielen van anderen. Wil je iemand een bericht sturen, klik dan op de knop "Bericht sturen".<br />
+                Vind je iemand leuk, klik dan op de "Like" knop. Wanneer deze persoon jou ook "liked" zal die op de chat pagina verschijnen onder "likes"!
+            </MudText>
+            <MudGrid>
+                @foreach (var user in users)
+                {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper>
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <img src="@profilePictures[users.IndexOf(user)]"
+                                asp-append-version="true" width="200px" height = "200px"/>  
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudGrid>
+                                    <MudItem xs="4">
+                                        <div>Naam:</div>
+                                        <div>@(!String.IsNullOrEmpty(user.FirstName) ? user.FirstName : user.UserName)</div>
+                                    </MudItem>
+                                    <MudItem xs="4">
+                                        <div>Leeftijd:</div>
+                                        <div>@(user.Age != null ? user.Age : "/")</div>
+                                    </MudItem>
+                                    <MudItem xs="4">
+                                        <div>Gender:</div>
+                                        <div>@(!String.IsNullOrEmpty(user.Gender) ? user.Gender : "/")</div>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <div>Beschrijving:</div>
+                                <div>@(!String.IsNullOrEmpty(user.Description) ? user.Description : "/")</div>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <div>Interesses:</div>
+                                <div>@(!String.IsNullOrEmpty(user.Interests) ? user.Interests : "/")</div>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudButton OnClick="@(() => LoadUserChat(@user.Id))" 
+                                StartIcon="@Icons.Material.Outlined.Send" Color="Color.Primary" 
+                                ButtonType="ButtonType.Button">Bericht sturen
+                                </MudButton>
+                                <MudButton OnClick="@(() => Like(@user.Id))" 
+                                Color="Color.Primary" 
+                                ButtonType="ButtonType.Button">Like
+                                </MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudItem>
+                }
+            </MudGrid>
+    </MudPaper>

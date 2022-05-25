@@ -1,0 +1,38 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+
+<MudNavMenu>
+<AuthorizeView>
+    <Authorized>
+        <MudNavLink Href="/home" Icon="@Icons.Material.Outlined.Home">
+            Startpagina
+        </MudNavLink>
+        <MudNavLink Href="/chat" Icon="@Icons.Material.Outlined.Chat">
+            Chatten
+        </MudNavLink>
+        <MudNavLink Href="/profiles" Icon="@Icons.Material.Outlined.PersonSearch">
+            Profielen Bekijken
+        </MudNavLink>
+        <MudNavLink Href="Identity/Account/Manage/Profile" Icon="@Icons.Material.Outlined.Person">
+            Mijn Profiel
+            </MudNavLink>
+        <MudNavLink OnClick="BeginSignOut" Icon="@Icons.Material.Outlined.Logout">
+            Uitloggen
+            </MudNavLink>
+    </Authorized>
+    <NotAuthorized>
+        <MudNavLink Href="authentication/register" Icon="@Icons.Material.Outlined.HowToReg">KLIK HIER OM JE IN TE SCHRIJVEN</MudNavLink>
+        <MudNavLink Href="authentication/login" Icon="@Icons.Material.Outlined.Login">KLIK HIER OM IN TE LOGGEN</MudNavLink>
+    </NotAuthorized>
+</AuthorizeView>
+</MudNavMenu>
+
+@code{
+    private async Task BeginSignOut(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}

@@ -1,0 +1,63 @@
+﻿@page
+@using BlazorInputFile
+@model ProfileModel
+@{
+    ViewData["Title"] = "Uw Profiel";
+    ViewData["ActivePage"] = ManageNavPages.Profile;
+}
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="profile-form" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-floating">
+                <input asp-for="Input.FirstName" class="form-control" type="text"/>
+                <label asp-for="Input.FirstName" class="form-label"></label>
+            </div>
+            <div class="form-floating">
+                <input asp-for="Input.Age" class="form-control" type="number"/>
+                <label asp-for="Input.Age" class="form-label"></label>
+            </div>
+            <div class="form-floating">
+                <input asp-for="Input.Gender" class="form-control" type="text" placeholder="Man/Vrouw/..."/>
+                <label asp-for="Input.Gender" class="form-label"></label>
+            </div>
+            <div class="form-floating">
+                <textarea asp-for="Input.Description" class="form-control" type="text" style="min-height: 150px;"></textarea>
+                <label asp-for="Input.Description" class="form-label"></label>
+            </div>
+            <div class="form-floating">
+                <input asp-for="Input.Interests" class="form-control" placeholder="Interesses" type="text"/>
+                <label asp-for="Input.Interests" class="form-label"></label>
+            </div>
+            <div class="form-floating">
+                <input asp-for="Input.ProfileImage" class="form-control" type="file" accept="image/*" onchange="loadFile(event)"/>
+                <label asp-for="Input.ProfileImage" class="form-label"></label>
+            </div>
+            <img id="output" width="200px" height="200px" src="@Model.ProfileImagePath"/>
+            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary" style="margin-top: 5%; margin-bottom: 5%;">Wijzigen</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+    <script type="text/javascript">  
+        // Add the following code if you want the name of the file appear on select  
+        $(".custom-file-input").on("change", function () {  
+            var fileName = $(this).val().split("\\").pop();  
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);  
+        });  
+    </script>
+    <script>
+      var loadFile = function(event) {
+        var output = document.getElementById('output');
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.onload = function() {
+          URL.revokeObjectURL(output.src) // free memory
+        }
+      };
+    </script>
+}

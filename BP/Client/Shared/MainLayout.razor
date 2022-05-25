@@ -1,0 +1,112 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.SignalR.Client
+<MudThemeProvider Theme="_currentTheme"/>
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudLayout >
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1" >
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
+        @*<MudToolBar DisableGutters="true">
+            
+        </MudToolBar>*@
+        <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
+            <CascadingValue Value="hubConnection">
+                @Body
+            </CascadingValue>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+@code {
+    private MudTheme _currentTheme = new MudTheme()
+        {
+            Palette = new Palette()
+            {
+                Black = "#100d17",
+                Background = "#8464c4",
+                BackgroundGrey = "#b28ff7",
+                Surface = "#b28ff7",
+                TextPrimary = "#100d17",
+                TextSecondary = "rgb(0,0,0)",
+                DrawerBackground = "#b28ff7",
+                DrawerText = "#100d17",
+                DrawerIcon = "#100d17",
+            },
+            Typography = new Typography()
+            {
+                Default = new Default()
+                {
+                    FontSize = "large"
+                },
+                H6 = new H6()
+                {
+                    FontSize = "large"
+                },
+                Body1 = new Body1()
+                {
+                    FontSize = "large"
+                },
+                Body2 = new Body2()
+                {
+                    FontSize = "large"
+                },
+                Subtitle1 = new Subtitle1()
+                {
+                    FontSize = "large"
+                },
+                Button = new Button()
+                {
+                    FontSize = "large"
+                },
+                Caption = new Caption()
+                {
+                    FontSize = "large"
+                },
+                Overline = new Overline()
+                {
+                    FontSize = "large"
+                }
+        }
+    };
+
+    bool _drawerOpen = true;
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private HubConnection hubConnection;
+    public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+        var CurrentUserId = user.Claims.Where(a => a.Type == "sub").Select(a => a.Value).FirstOrDefault();
+
+        hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/signalRHub")).Build();
+        await hubConnection.StartAsync();
+        hubConnection.On<string, string, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
+        {
+            if (CurrentUserId == receiverUserId)
+            {
+                _snackBar.Add(message, Severity.Info, config =>
+                {
+                    config.VisibleStateDuration = 10000;
+                    config.HideTransitionDuration = 500;
+                    config.ShowTransitionDuration = 500;
+                    config.Action = "Chat?";
+                    config.ActionColor = Color.Info;
+                    config.Onclick = snackbar =>
+                    {
+                        _navigationManager.NavigateTo($"chat/{senderUserId}");
+                        return Task.CompletedTask;
+                    };
+                });
+            }
+        });
+    }
+}
